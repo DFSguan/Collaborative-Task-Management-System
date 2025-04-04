@@ -1,29 +1,25 @@
-from flask import Flask, request, jsonify
-import firebase_admin
-from firebase_admin import credentials, firestore
+from flask import Flask, jsonify, request
+from firebase_config import initialize_firebase
+from signup import signup_routes
+from login import login_routes
 
-# Initialize Flask app
 app = Flask(__name__)
+db, _ = initialize_firebase()  # _ = auth, not needed here
 
-# Load Firebase credentials
-cred = credentials.Certificate("firebase_config.json")
-firebase_admin.initialize_app(cred)
-
-# Initialize Firestore database
-db = firestore.client()
+# Register blueprints
+app.register_blueprint(signup_routes)
+app.register_blueprint(login_routes)
 
 @app.route('/')
 def home():
     return jsonify({"message": "Flask with Firebase is working!"})
 
-# Example: Add data to Firestore
 @app.route('/add', methods=['POST'])
 def add_data():
-    data = request.json  # Get JSON data from request
-    doc_ref = db.collection('tasks').add(data)  # Add to Firestore
+    data = request.json
+    doc_ref = db.collection('tasks').add(data)
     return jsonify({"message": "Data added successfully!", "id": doc_ref[1].id})
 
-# Example: Retrieve data from Firestore
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
     tasks_ref = db.collection('tasks').stream()
