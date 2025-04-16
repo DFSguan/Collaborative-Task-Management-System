@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +19,32 @@ type RootStackParamList = {
 };
 
 const LoginScreen: React.FC = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+  
+    const handleLogin = async () => {
+      try {
+        const response = await fetch('http://192.168.245.174:3000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          Alert.alert('Success', 'Successfully Login!');
+        } else {
+          Alert.alert('Login Failed', data.error || 'Password went wrong.');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Could not connect to server.');
+        console.error('Login error:', error);
+      }
+    };
+
   const navigation = useNavigation<LoginScreenNavigationProp>();
   return (
     <SafeAreaView style={styles.container}>
@@ -32,6 +59,8 @@ const LoginScreen: React.FC = () => {
       <Text style={styles.label}>Username</Text>
       <TextInput
         style={styles.input}
+        value={email}
+        onChangeText={setEmail}
         placeholder="Enter your Username"
         placeholderTextColor="#888"
       />
@@ -39,6 +68,8 @@ const LoginScreen: React.FC = () => {
       <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
+        value={password}
+        onChangeText={setPassword}
         placeholder="●●●●●●●●●●"
         secureTextEntry
         placeholderTextColor="#888"
@@ -48,7 +79,7 @@ const LoginScreen: React.FC = () => {
         <Text style={styles.forgot}>Forget Password</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.loginButton}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
 
@@ -65,7 +96,7 @@ const LoginScreen: React.FC = () => {
       </TouchableOpacity>
 
       <Text style={styles.registerText}>
-        Don’t have an account? <Text style={styles.registerLink}>Register</Text>
+        Don’t have an account? <Text style={styles.registerLink} onPress={() => navigation.navigate('SignUp')}>Register</Text>
       </Text>
     </SafeAreaView>
   );

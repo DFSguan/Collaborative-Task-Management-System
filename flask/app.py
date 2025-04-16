@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from firebase_config import initialize_firebase
 from signup import signup_routes
 from login import login_routes
 
 app = Flask(__name__)
+CORS(app)
 db, _ = initialize_firebase()  # _ = auth, not needed here
 
 # Register blueprints
@@ -27,4 +29,4 @@ def get_tasks():
     return jsonify(tasks)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host = '192.168.245.174', port=3000, debug=True)

@@ -3,9 +3,11 @@ import {
   View,
   Text,
   ImageBackground,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
@@ -14,88 +16,76 @@ type RootStackParamList = {
   Login: undefined;
 };
 
-type WelcomeScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
-};
+type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
+const WelcomeScreen: React.FC = () => {
+  const navigation = useNavigation<WelcomeScreenNavigationProp>();
+
   return (
-    <ImageBackground
-      source={require('../../assets/images/app-logo.png')} // your image path
-      style={styles.background}
-      imageStyle={{ opacity: 0.25 }}
-    >
-      <View style={styles.bottomContainer}>
-        <Text style={styles.title}>Welcome to CollabTask</Text>
-        <Text style={styles.subtitle}>
-          Your Smart Way to Manage Assignments, Projects & Group Work
-        </Text>
-
-        <TouchableOpacity
-          style={styles.buttonPrimary}
-          onPress={() => navigation.navigate('SignUp')}
-        >
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.buttonSecondary}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
+    <SafeAreaView style={styles.container}>
+      <ImageBackground
+        source={require('../../assets/images/app-logo.png')} // Replace with your image path
+        style={styles.imageBackground}
+        resizeMode="cover"
+      >
+        <View style={styles.overlayBox}>
+          <Text style={styles.title}>Organize Better, Collaborate Smarter</Text>
+          <Text style={styles.subtitle}>
+            CollabTask helps university students manage group assignments,
+            track progress, and collaborate seamlessly.
+          </Text>
+          <TouchableOpacity
+            style={styles.getStartedButton} 
+            onPress={() => navigation.navigate('SignUp')}
+          >
+            <Text style={styles.getStartedText}>Get started →</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
 export default WelcomeScreen;
 
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    justifyContent: 'flex-end', // move content to the bottom
+  },
+  imageBackground: {
+    flex: 1,
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  bottomContainer: {
-    width: '90%',
-    padding: 25,
+  overlayBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 30,
+    padding: 24,
+    width: '90%',
+    marginBottom: 30,
     alignItems: 'center',
-    elevation: 30,
-    marginHorizontal: 20,
-    marginBottom: 20
   },
   title: {
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    color: '#3b3b3b',
     textAlign: 'center',
+    marginBottom: 20,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 25,
+    marginBottom: 20,
   },
-  buttonPrimary: {
-    backgroundColor: '#4F86F7',
-    paddingVertical: 14,
-    borderRadius: 12,
-    width: '100%',
-    marginBottom: 15,
+  getStartedButton: {
+    backgroundColor: '#8A2BE2', // or #a355f2
+    borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
   },
-  buttonSecondary: {
-    backgroundColor: '#A0BFFF',
-    paddingVertical: 14,
-    borderRadius: 12,
-    width: '100%',
-  },
-  buttonText: {
+  getStartedText: {
     color: '#fff',
-    textAlign: 'center',
     fontWeight: '600',
     fontSize: 16,
   },

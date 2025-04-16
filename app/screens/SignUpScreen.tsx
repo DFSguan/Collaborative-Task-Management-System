@@ -1,33 +1,84 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert 
 } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+
+type SignUpScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+
+type RootStackParamList = {
+  Welcome: undefined;
+  Login: undefined;
+  SignUp: undefined;
+};
 
 const SignUpScreen: React.FC = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignup = async () => {
+    try {
+      const response = await fetch('http://192.168.245.174:3000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Success', 'Account created successfully!');
+      } else {
+        Alert.alert('Signup Failed', data.error || 'Something went wrong.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not connect to server.');
+      console.error('Signup error:', error);
+    }
+  };
+  const navigation = useNavigation<SignUpScreenNavigationProp>();
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.backButton}>
+       <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Welcome')}>
         <Text style={styles.backArrow}>←</Text>
       </TouchableOpacity>
 
       <Text style={styles.header}>
-        Login Account <Text style={styles.wave}>👋</Text>
+        Create Account <Text style={styles.wave}>👋</Text>
       </Text>
 
       <Text style={styles.label}>Username</Text>
       <TextInput
         style={styles.input}
+        value={name}
+        onChangeText={setName}
         placeholder="Enter your Username"
+        placeholderTextColor="#888"
+      />
+
+      <Text style={styles.label}>Email</Text>
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Enter your Email"
         placeholderTextColor="#888"
       />
 
       <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
+        value={password}
+        onChangeText={setPassword}
         placeholder="●●●●●●●●●●"
         secureTextEntry
         placeholderTextColor="#888"
@@ -37,8 +88,8 @@ const SignUpScreen: React.FC = () => {
         <Text style={styles.forgot}>Forget Password</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Login</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={handleSignup}>
+        <Text style={styles.loginButtonText}>Continue</Text>
       </TouchableOpacity>
 
       <Text style={styles.orText}>─────────  or  ─────────</Text>
@@ -54,7 +105,7 @@ const SignUpScreen: React.FC = () => {
       </TouchableOpacity>
 
       <Text style={styles.registerText}>
-        Don’t have an account? <Text style={styles.registerLink}>Register</Text>
+        Already have an account? <Text style={styles.registerLink} onPress={() => navigation.navigate('Login')}>Login</Text>
       </Text>
     </SafeAreaView>
   );
