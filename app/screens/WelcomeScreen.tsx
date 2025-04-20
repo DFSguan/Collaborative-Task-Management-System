@@ -12,8 +12,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   Welcome: undefined;
-  SignUp: undefined;
   Login: undefined;
+  SignUp: undefined;
+  Project: undefined;
 };
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;

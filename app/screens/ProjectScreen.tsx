@@ -7,12 +7,13 @@ import {
   SafeAreaView,
   Alert
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { loginUser } from '../api/api';
+import { createProject } from '../api/api';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext';
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+type ProjectScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Project'>;
 
 type RootStackParamList = {
   Welcome: undefined;
@@ -21,84 +22,79 @@ type RootStackParamList = {
   Project: undefined;
 };
 
-const LoginScreen: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const { setUser } = useUser(); 
+const ProjectScreen: React.FC = () => {
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const { user, setUser } = useUser();
   
-    const handleLogin = async () => {
-      try { 
-        const data = await loginUser(email, password);
-        setUser({
-          userID: data.userID,
-          email: data.email,
-          name: data.name 
-        });
-        Alert.alert('Login Success', `Welcome ${data.name} and your email ${data.email} , id ${data.userID}`);
-        navigation.navigate('Project'); // or pass data if needed
+    const handleCreateProject = async () => {
+      try {
+        if (!title || !description) {
+          Alert.alert('Validation Error', 'Please fill in all required fields.');
+          return;
+        }
+    
+        await createProject(title, description, user?.userID || '', user?.userID || ''); // use context user ID
+    
+        Alert.alert('Success', 'Project created successfully!');
+        setTitle('');
+        setDescription('');
       } catch (err: any) {
-        Alert.alert('Login Failed', err.message);
+        Alert.alert('Project Creation Failed', err.message);
       }
     };
 
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+    const handleLogout = async () => {
+      try {
+        await AsyncStorage.removeItem('user'); // remove from storage
+        setUser(null); // clear from context
+        navigation.replace('Welcome'); // replace current screen with Login
+      } catch (error) {
+        console.error('Error logging out:', error);
+      }
+    };
+
+  const navigation = useNavigation<ProjectScreenNavigationProp>();
   return (
     <SafeAreaView style={styles.container}>
-       <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Welcome')}>
+       <TouchableOpacity style={styles.backButton} onPress={handleLogout}>
         <Text style={styles.backArrow}>←</Text>
       </TouchableOpacity>
 
       <Text style={styles.header}>
-        Login Account <Text style={styles.wave}>👋</Text>
+        Home Screen <Text style={styles.wave}>👋</Text>
       </Text>
 
-      <Text style={styles.label}>Username</Text>
+      <Text style={styles.label}>Title</Text>
       <TextInput
         style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Enter your Username"
+        value={title}
+        onChangeText={setTitle}
+        placeholder="Enter your Title"
         placeholderTextColor="#888"
       />
 
-      <Text style={styles.label}>Password</Text>
+      <Text style={styles.label}>Description</Text>
       <TextInput
         style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="●●●●●●●●●●"
-        secureTextEntry
+        value={description}
+        onChangeText={setDescription}
+        placeholder="Enter your Description"
         placeholderTextColor="#888"
       />
 
-      <TouchableOpacity>
-        <Text style={styles.forgot}>Forget Password</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleCreateProject}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
 
-      <Text style={styles.orText}>─────────  or  ─────────</Text>
-
-      <TouchableOpacity style={styles.socialButton}>
-        <Text style={styles.socialIcon}>🔵</Text>
-        <Text style={styles.socialText}>Login with Google</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.socialButton}>
-        <Text style={styles.socialIcon}>⚫</Text>
-        <Text style={styles.socialText}>Login with Apple</Text>
-      </TouchableOpacity>
-
       <Text style={styles.registerText}>
-        Don’t have an account? <Text style={styles.registerLink} onPress={() => navigation.navigate('SignUp')}>Register</Text>
+        Task <Text style={styles.registerLink} onPress={() => navigation.navigate('SignUp')}>Register</Text>
       </Text>
     </SafeAreaView>
   );
 };
 
-export default LoginScreen;
+export default ProjectScreen;
 
 const styles = StyleSheet.create({
     container: {

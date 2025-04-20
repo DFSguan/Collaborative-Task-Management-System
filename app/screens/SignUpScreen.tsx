@@ -8,6 +8,7 @@ import {
   Alert 
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { signUpUser } from '../api/api';
 import { useNavigation } from '@react-navigation/native';
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -16,6 +17,7 @@ type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   SignUp: undefined;
+  Project: undefined;
 };
 
 const SignUpScreen: React.FC = () => {
@@ -25,24 +27,12 @@ const SignUpScreen: React.FC = () => {
 
   const handleSignup = async () => {
     try {
-      const response = await fetch('http://192.168.245.174:3000/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const data = await signUpUser(email, password, name);
+      Alert.alert('Success', 'Account created successfully!');
 
-      const data = await response.json();
-
-      if (response.ok) {
-        Alert.alert('Success', 'Account created successfully!');
-      } else {
-        Alert.alert('Signup Failed', data.error || 'Something went wrong.');
-      }
-    } catch (error) {
+    } catch (err: any) {
       Alert.alert('Error', 'Could not connect to server.');
-      console.error('Signup error:', error);
+      console.error('Signup error:', err);
     }
   };
   const navigation = useNavigation<SignUpScreenNavigationProp>();
