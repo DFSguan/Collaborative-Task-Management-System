@@ -12,15 +12,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { createProject } from '../api/api';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext';
+import { RootStackParamList } from '../helper/type';
 
 type ProjectScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Project'>;
-
-type RootStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  SignUp: undefined;
-  Project: undefined;
-};
 
 const ProjectScreen: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -48,7 +42,7 @@ const ProjectScreen: React.FC = () => {
       try {
         await AsyncStorage.removeItem('user'); // remove from storage
         setUser(null); // clear from context
-        navigation.replace('Welcome'); // replace current screen with Login
+
       } catch (error) {
         console.error('Error logging out:', error);
       }
@@ -57,7 +51,7 @@ const ProjectScreen: React.FC = () => {
   const navigation = useNavigation<ProjectScreenNavigationProp>();
   return (
     <SafeAreaView style={styles.container}>
-       <TouchableOpacity style={styles.backButton} onPress={handleLogout}>
+       <TouchableOpacity style={styles.backButton} onPress={()=> navigation.navigate('Main')}>
         <Text style={styles.backArrow}>←</Text>
       </TouchableOpacity>
 
@@ -84,11 +78,11 @@ const ProjectScreen: React.FC = () => {
       />
 
       <TouchableOpacity style={styles.loginButton} onPress={handleCreateProject}>
-        <Text style={styles.loginButtonText}>Login</Text>
+        <Text style={styles.loginButtonText}>Create Project</Text>
       </TouchableOpacity>
 
       <Text style={styles.registerText}>
-        Task <Text style={styles.registerLink} onPress={() => navigation.navigate('SignUp')}>Register</Text>
+        <Text style={styles.registerLink} onPress={handleLogout}>Log Out</Text>
       </Text>
     </SafeAreaView>
   );

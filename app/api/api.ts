@@ -1,6 +1,6 @@
 // src/api.ts
-
-const BASE_URL = 'http://192.168.245.174:3000'; // Replace with your actual IP
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL; // Replace with your actual IP
+console.log(`my url is ${BASE_URL}`);
 
 const request = async (endpoint: string, method = 'GET', body?: any) => {
   const config: RequestInit = {
@@ -32,18 +32,32 @@ export const signUpUser = (email: string, password: string, name: string) =>
   request('/signup', 'POST', { email, password, name });
 
 // ─────────── Projects ───────────
-export const getProjects = () =>
-  request('/projects');
+export const getProjects = (userId: string) =>
+  request(`/get_projects?userID=${userId}`);
 
 export const createProject = (title: string, description: string, ownerId: string, memberId: string) =>
   request('/create_project', 'POST', { title, description, ownerID: ownerId, members: [memberId] });
 
 // ─────────── Tasks ───────────
 export const getTasks = (projectId: string) =>
-  request(`/projects/${projectId}/tasks`);
+  request(`/get_tasks?projectID=${projectId}`);
 
-export const createTask = (projectId: string, title: string, deadline: string) =>
-  request(`/projects/${projectId}/tasks`, 'POST', { title, deadline });
+export const createTask = (
+  projectId: string,
+  title: string,
+  description: string,
+  deadline: string,
+  priority: string,
+  assignedTo: string
+) =>
+  request('/create_task', 'POST', {
+    title,
+    description,
+    dueDate: deadline,
+    priority,
+    assignedTo,
+    projectID: projectId,
+  });
 
 // ─────────── TaskList ───────────
 export const getTaskList = (taskId: string) =>

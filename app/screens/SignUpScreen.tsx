@@ -10,17 +10,12 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { signUpUser } from '../api/api';
 import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../helper/type';
 
-type SignUpScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
-
-type RootStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  SignUp: undefined;
-  Project: undefined;
-};
+type SignUpScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'SignUp'>;
 
 const SignUpScreen: React.FC = () => {
+  const navigation = useNavigation<SignUpScreenNavigationProp>();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,7 +30,7 @@ const SignUpScreen: React.FC = () => {
       console.error('Signup error:', err);
     }
   };
-  const navigation = useNavigation<SignUpScreenNavigationProp>();
+  
   return (
     <SafeAreaView style={styles.container}>
        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Welcome')}>

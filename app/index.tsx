@@ -3,10 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import your screens
-import Welcome from './screens/WelcomeScreen';
-import Login from './screens/LoginScreen';
-import SignUp from './screens/SignUpScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
+import TaskListScreen from './screens/TaskListScreen';
+import LoginScreen from './screens/LoginScreen';
+import SignUpScreen from './screens/SignUpScreen';
 import ProjectScreen from './screens/ProjectScreen';
+import MainScreen from './screens/MainScreen';
+import AddTaskScreen from './screens/AddTaskScreen'
 import { UserProvider, useUser } from './context/UserContext';
 
 const Stack = createNativeStackNavigator();
@@ -38,13 +41,18 @@ const AppNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
         // If logged in, go to MainScreen
-        <Stack.Screen name="Main" component={ProjectScreen} />
+        <>
+          <Stack.Screen name="Main" component={MainScreen} />
+          <Stack.Screen name="Project" component={ProjectScreen} />
+          <Stack.Screen name="TaskList" component={TaskListScreen} />
+          <Stack.Screen name="AddTask" component={AddTaskScreen} />
+        </>
       ) : (
         // If not logged in, show Welcome, Login, SignUp
         <>
-          <Stack.Screen name="Welcome" component={Welcome} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
         </>
       )}
     </Stack.Navigator>

@@ -11,37 +11,30 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { loginUser } from '../api/api';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext';
+import { RootStackParamList } from '../helper/type';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-type RootStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  SignUp: undefined;
-  Project: undefined;
-};
-
 const LoginScreen: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const { setUser } = useUser(); 
-  
-    const handleLogin = async () => {
-      try { 
-        const data = await loginUser(email, password);
-        setUser({
-          userID: data.userID,
-          email: data.email,
-          name: data.name 
-        });
-        Alert.alert('Login Success', `Welcome ${data.name} and your email ${data.email} , id ${data.userID}`);
-        navigation.navigate('Project'); // or pass data if needed
-      } catch (err: any) {
-        Alert.alert('Login Failed', err.message);
-      }
-    };
-
   const navigation = useNavigation<LoginScreenNavigationProp>();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { setUser } = useUser(); 
+  
+  const handleLogin = async () => {
+    try { 
+      const data = await loginUser(email, password);
+      setUser({
+        userID: data.userID,
+        email: data.email,
+        name: data.name 
+      });
+      Alert.alert('Login Success', `Welcome ${data.name} and your email ${data.email} , id ${data.userID}`);
+    } catch (err: any) {
+      Alert.alert('Login Failed', err.message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Welcome')}>

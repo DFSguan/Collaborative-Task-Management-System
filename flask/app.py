@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from firebase_config import initialize_firebase
+from task import task_routes
+from project import project_routes
 from signup import signup_routes
 from login import login_routes
 
@@ -11,6 +13,8 @@ db, _ = initialize_firebase()  # _ = auth, not needed here
 # Register blueprints
 app.register_blueprint(signup_routes)
 app.register_blueprint(login_routes)
+app.register_blueprint(project_routes)
+app.register_blueprint(task_routes)
 
 @app.route('/')
 def home():

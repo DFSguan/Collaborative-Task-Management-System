@@ -34,10 +34,25 @@ def login():
         if "error" in result:
             return jsonify({"error": result["error"]["message"]}), 401
 
+         # After successful login, look up user data from Firestore
+        user_docs = db.collection('User').where('email', '==', email).stream()
+        user_data = None
+        user_id = None
+
+        for doc in user_docs:
+            user_data = doc.to_dict()
+            user_id = doc.id
+            break  # assuming only one match
+
+        if not user_data:
+            return jsonify({'error': 'User not found in Firestore'}), 404
+
         return jsonify({
             "message": "Login successful",
-            "idToken": result["idToken"],  # Used to authenticate further requests if needed
-            "email": result["email"]
+            "email": result["email"],
+            "userID": user_id,
+            "name": user_data.get("name"),
+            "idToken": result["idToken"]  # optional, for secure actions
         }), 200
 
     except Exception as e:
