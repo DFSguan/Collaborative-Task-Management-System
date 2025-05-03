@@ -6,7 +6,21 @@ export type RootStackParamList = {
   Main: undefined;
   TaskList: { projectId: string; projectTitle: string };
   AddTask: { projectID: string };
+  TaskDetail: {
+    taskID: string;
+    title: string;
+    description: string;
+    priority: string;
+    dueDate: string;
+    assignedTo: string;
+    status: string;
+  };
 };
+
+export interface User {
+  userID: string;
+  username: string;
+}
 
 export interface Project {
   projectID: string;

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList, Task, Project } from '../helper/type';
-import { getTasks } from '../api/api';
+import { RootStackParamList, Task } from '../../helper/type';
+import { getTasks } from '../../api/api';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useIsFocused } from '@react-navigation/native';
 
 type TaskListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'TaskList'>;
 type TaskListScreenRouteProp = RouteProp<RootStackParamList, 'TaskList'>;
@@ -17,12 +18,14 @@ const TaskListScreen: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         const data = await getTasks(projectId);
         console.log('Fetched tasks:', data);
-    
+
         if (data && Array.isArray(data.tasks)) {
           setTasks(data.tasks);
         } else {
@@ -36,8 +39,11 @@ const TaskListScreen: React.FC = () => {
       }
     };
 
-    fetchTasks();
-  }, [projectId]);
+    if (isFocused) {
+      setLoading(true); // Optional: show loader again while refetching
+      fetchTasks();
+    }
+  }, [isFocused, projectId]);
 
   if (loading) {
     return (
@@ -62,7 +68,20 @@ const TaskListScreen: React.FC = () => {
         data={tasks}
         keyExtractor={(item) => item.taskID}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.projectItem}>
+          <TouchableOpacity 
+            style={styles.projectItem}
+            onPress={() =>
+              navigation.navigate('TaskDetail', {
+                taskID: item.taskID,
+                title: item.title,
+                description: item.description,
+                priority: item.priority,
+                dueDate: item.dueDate,
+                assignedTo: item.assignedUsername,
+                status: item.status,
+              })
+            }
+          >
             <Text style={styles.projectTitle}>{item.title}</Text>
             <Text>Description: {item.description}</Text>
             <Text>Priority: {item.priority}</Text>

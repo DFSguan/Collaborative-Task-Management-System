@@ -57,3 +57,29 @@ def login():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@login_routes.route('/users', methods=['GET'])
+def get_users():
+    try:
+        # Fetch all users from Firestore
+        user_docs = db.collection('User').stream()
+        
+        users = []
+        for doc in user_docs:
+            user_data = doc.to_dict()
+            user_id = doc.id
+            # Assuming 'username' is a field in the Firestore document
+            users.append({
+                'userID': user_id,
+                'username': user_data.get('name')
+            })
+
+        if not users:
+            return jsonify({'error': 'No users found'}), 404
+
+        return jsonify({
+            'users': users
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

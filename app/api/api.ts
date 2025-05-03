@@ -59,6 +59,29 @@ export const createTask = (
     projectID: projectId,
   });
 
+export const updateTask = (
+  taskId: string,
+  title: string,
+  description: string,
+  status: string,
+  deadline: string,
+  priority: string,
+  assignedTo: string
+) =>
+  request(`/update_task/${taskId}`, 'PUT', {
+    title,
+    description,
+    status,
+    dueDate: deadline,
+    priority,
+    assignedUsername: assignedTo
+  });
+
+export const deleteTask = (taskId: string) =>
+  request(`/delete_task/${taskId}`, 'DELETE');
+  //———————————— Users ———————————
+export const getUsers = () => request('/users', 'GET');
+
 // ─────────── TaskList ───────────
 export const getTaskList = (taskId: string) =>
   request(`/tasks/${taskId}/tasklist`);
