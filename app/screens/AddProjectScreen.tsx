@@ -14,9 +14,9 @@ import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext';
 import { RootStackParamList } from '../helper/type';
 
-type ProjectScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Project'>;
+type AddProjectScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AddProject'>;
 
-const ProjectScreen: React.FC = () => {
+const AddProjectScreen: React.FC = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const { user, setUser } = useUser();
@@ -48,7 +48,7 @@ const ProjectScreen: React.FC = () => {
       }
     };
 
-  const navigation = useNavigation<ProjectScreenNavigationProp>();
+  const navigation = useNavigation<AddProjectScreenNavigationProp>();
   return (
     <SafeAreaView style={styles.container}>
        <TouchableOpacity style={styles.backButton} onPress={()=> navigation.navigate('Main')}>
@@ -88,7 +88,7 @@ const ProjectScreen: React.FC = () => {
   );
 };
 
-export default ProjectScreen;
+export default AddProjectScreen;
 
 const styles = StyleSheet.create({
     container: {

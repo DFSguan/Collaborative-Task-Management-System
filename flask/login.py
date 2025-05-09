@@ -68,10 +68,10 @@ def get_users():
         for doc in user_docs:
             user_data = doc.to_dict()
             user_id = doc.id
-            # Assuming 'username' is a field in the Firestore document
             users.append({
                 'userID': user_id,
-                'username': user_data.get('name')
+                'username': user_data.get('name'),
+                'avatar': user_data.get('avatar')  # include avatar in response
             })
 
         if not users:

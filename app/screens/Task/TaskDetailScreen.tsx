@@ -89,7 +89,7 @@ const TaskDetailScreen: React.FC = () => {
         onChangeText={setEditedStatus}
       />
 
-<Text style={styles.label}>Assigned To:</Text>
+      <Text style={styles.label}>Assigned To:</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={editedAssignedTo}

@@ -4,13 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import your screens
 import WelcomeScreen from './screens/WelcomeScreen';
-import TaskListScreen from './screens/Task/TaskListScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignUpScreen from './screens/SignUpScreen';
-import ProjectScreen from './screens/ProjectScreen';
-import MainScreen from './screens/MainScreen';
+import BottomTabNavigator from './screens/BottomTabNavigator';
+import AddProjectScreen from './screens/AddProjectScreen';
 import AddTaskScreen from './screens/Task/AddTaskScreen'
 import TaskDetailScreen from './screens/Task/TaskDetailScreen';
+import TaskListScreen from './screens/Task/TaskListScreen';
 import { UserProvider, useUser } from './context/UserContext';
 
 const Stack = createNativeStackNavigator();
@@ -41,10 +41,10 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        // If logged in, go to MainScreen
+        // If logged in, go to BottomTabNavigator
         <>
-          <Stack.Screen name="Main" component={MainScreen} />
-          <Stack.Screen name="Project" component={ProjectScreen} />
+          <Stack.Screen name="Home" component={BottomTabNavigator} />
+          <Stack.Screen name="AddProject" component={AddProjectScreen} />
           <Stack.Screen name="TaskList" component={TaskListScreen} />
           <Stack.Screen name="AddTask" component={AddTaskScreen} />
           <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />

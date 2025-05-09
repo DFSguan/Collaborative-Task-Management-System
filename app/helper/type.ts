@@ -2,8 +2,9 @@ export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   SignUp: undefined;
-  Project: undefined;
+  AddProject: undefined;
   Main: undefined;
+  ProjectList: undefined;
   TaskList: { projectId: string; projectTitle: string };
   AddTask: { projectID: string };
   TaskDetail: {
@@ -20,12 +21,14 @@ export type RootStackParamList = {
 export interface User {
   userID: string;
   username: string;
+  avatar: string;
 }
 
 export interface Project {
   projectID: string;
   title: string;
   description: string;
+  dueDate: string;
 }
 
 export type Task = {
