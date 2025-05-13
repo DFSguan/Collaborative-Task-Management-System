@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import your screens
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import BottomTabNavigator from './screens/BottomTabNavigator';
-import AddProjectScreen from './screens/AddProjectScreen';
+import AddProjectScreen from './screens/Project/AddProjectScreen';
+import ProjectDetailScreen from './screens/Project/ProjectDetailScreen';
 import AddTaskScreen from './screens/Task/AddTaskScreen'
 import TaskDetailScreen from './screens/Task/TaskDetailScreen';
 import TaskListScreen from './screens/Task/TaskListScreen';
@@ -39,25 +41,28 @@ const AppNavigator = () => {
   if (loading) return null; // Optional: show splash screen or loader
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {user ? (
-        // If logged in, go to BottomTabNavigator
-        <>
-          <Stack.Screen name="Home" component={BottomTabNavigator} />
-          <Stack.Screen name="AddProject" component={AddProjectScreen} />
-          <Stack.Screen name="TaskList" component={TaskListScreen} />
-          <Stack.Screen name="AddTask" component={AddTaskScreen} />
-          <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
-        </>
-      ) : (
-        // If not logged in, show Welcome, Login, SignUp
-        <>
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-        </>
-      )}
-    </Stack.Navigator>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          // If logged in, go to BottomTabNavigator
+          <>
+            <Stack.Screen name="Home" component={BottomTabNavigator} />
+            <Stack.Screen name="AddProject" component={AddProjectScreen} />
+            <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
+            <Stack.Screen name="TaskList" component={TaskListScreen} />
+            <Stack.Screen name="AddTask" component={AddTaskScreen} />
+            <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
+          </>
+        ) : (
+          // If not logged in, show Welcome, Login, SignUp
+          <>
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </GestureHandlerRootView>
   );
 };
 

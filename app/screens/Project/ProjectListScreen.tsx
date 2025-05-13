@@ -10,10 +10,10 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../helper/type';
-import { Project } from '../helper/type';
-import { getProjects } from '../api/api';
-import { useUser } from '../context/UserContext';
+import { RootStackParamList } from '../../helper/type';
+import { Project } from '../../helper/type';
+import { getProjectByUser } from '../../api/api';
+import { useUser } from '../../context/UserContext';
 
 type ProjectListScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProjectList'>;
 
@@ -27,7 +27,7 @@ const ProjectListScreen = () => {
     const fetchProjects = async () => {
       try {
         if (user?.userID) {
-          const data = await getProjects(user.userID);
+          const data = await getProjectByUser(user.userID);
           setProjects(data.projects || []);
         }
       } catch (error) {
@@ -45,9 +45,8 @@ const ProjectListScreen = () => {
   };
 
   const handleProjectPress = (project: Project) => {
-      navigation.navigate('TaskList', {
+      navigation.navigate('ProjectDetail', {
         projectId: project.projectID,
-        projectTitle: project.title,
       });
     };
 
@@ -55,7 +54,9 @@ const ProjectListScreen = () => {
     <TouchableOpacity style={styles.card} onPress={() => handleProjectPress(item)}>
       <View style={styles.cardHeader}>
         <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.deadline}>Due: {item.dueDate ?? 'N/A'}</Text>
+        <Text style={styles.deadline}>
+          Due: {item.deadline ? new Date(item.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+        </Text>
       </View>
       <Text style={styles.description}>{item.description}</Text>
       <View style={styles.cardFooter}>

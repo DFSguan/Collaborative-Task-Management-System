@@ -32,15 +32,21 @@ export const signUpUser = (email: string, password: string, name: string) =>
   request('/signup', 'POST', { email, password, name });
 
 // ─────────── Projects ───────────
-export const getProjects = (userId: string) =>
+export const getProjectByUser = (userId: string) =>
   request(`/get_projects?userID=${userId}`);
 
-export const createProject = (title: string, description: string, ownerId: string, memberId: string) =>
-  request('/create_project', 'POST', { title, description, ownerID: ownerId, members: [memberId] });
+export const getProjectByProjectID = (projectID: string) =>
+  request(`/get_projects?projectID=${projectID}`);
+
+export const createProject = (title: string, description: string, ownerId: string, memberId: string, deadline: string) =>
+  request('/create_project', 'POST', { title, description, ownerID: ownerId, members: [memberId], deadline });
 
 // ─────────── Tasks ───────────
-export const getTasks = (projectId: string) =>
+export const getTasksByProjectID = (projectId: string) =>
   request(`/get_tasks?projectID=${projectId}`);
+
+export const getTasksByProjectIDAndAssignee = (projectId: string, assignedTo: string) =>
+  request(`/get_tasks?projectID=${projectId}&assignedTo=${assignedTo}`);
 
 export const createTask = (
   projectId: string,

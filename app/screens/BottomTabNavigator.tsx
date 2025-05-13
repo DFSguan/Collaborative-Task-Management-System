@@ -7,7 +7,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MainScreen from '../screens/MainScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import CalendarScreen from '../screens/CalendarScreen';
-import ProjectListScreen from './ProjectListScreen';
+import ProjectListScreen from './Project/ProjectListScreen';
 
 const Tab = createBottomTabNavigator();
 

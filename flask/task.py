@@ -12,7 +12,7 @@ def create_task():
         data = request.get_json()
         title = data.get('title')
         description = data.get('description')
-        status = data.get('status', 'Not Started')
+        status = data.get('status', 'To Do')
         priority = data.get('priority', 'Medium')
         assigned_to = data.get('assignedTo')
         due_date = data.get('dueDate')  # Optional
@@ -60,28 +60,32 @@ def get_tasks():
         assigned_to = request.args.get('assignedTo')
 
         tasks_ref = db.collection('Tasks')
+        query = tasks_ref
 
+        # Apply filters based on query parameters
         if project_id:
-            query = tasks_ref.where('projectID', '==', project_id)
-        elif assigned_to:
-            query = tasks_ref.where('assignedTo', '==', assigned_to)
-        else:
-            return jsonify({'error': 'projectID or assignedTo is required'}), 400
+            query = query.where('projectID', '==', project_id)
+        if assigned_to:
+            query = query.where('assignedTo', '==', assigned_to)
 
         tasks = []
         for doc in query.stream():
             task = doc.to_dict()
 
-            # ✅ Add assignedUsername by looking up the User collection
+            # Attach user info if assigned
             assigned_user_id = task.get('assignedTo')
             if assigned_user_id:
                 user_doc = db.collection('User').document(assigned_user_id).get()
                 if user_doc.exists:
-                    task['assignedUsername'] = user_doc.to_dict().get('name', '')
+                    user_data = user_doc.to_dict()
+                    task['assignedUsername'] = user_data.get('name', '')
+                    task['assignedAvatar'] = user_data.get('avatar', '')
                 else:
                     task['assignedUsername'] = 'Unknown User'
+                    task['assignedAvatar'] = ''
             else:
                 task['assignedUsername'] = 'Unassigned'
+                task['assignedAvatar'] = ''
 
             tasks.append(task)
 

@@ -71,7 +71,7 @@ def get_users():
             users.append({
                 'userID': user_id,
                 'username': user_data.get('name'),
-                'avatar': user_data.get('avatar')  # include avatar in response
+                'avatar': user_data.get('avatar')
             })
 
         if not users:

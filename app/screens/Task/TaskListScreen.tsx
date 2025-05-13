@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList, Task } from '../../helper/type';
-import { getTasks } from '../../api/api';
+import { getTasksByProjectID } from '../../api/api';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -23,7 +23,7 @@ const TaskListScreen: React.FC = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const data = await getTasks(projectId);
+        const data = await getTasksByProjectID(projectId);
         console.log('Fetched tasks:', data);
 
         if (data && Array.isArray(data.tasks)) {

@@ -6,52 +6,41 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  FlatList,
   Alert,
+  FlatList,
   Platform,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, User } from '../../helper/type';
-import { getUsers, createTask } from '../../api/api';
+import { useUser } from '../../context/UserContext';
+import { createProject, getUsers } from '../../api/api';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-type AddTaskRouteProp = RouteProp<RootStackParamList, 'AddTask'>;
-type AddTaskNavigationProp = StackNavigationProp<RootStackParamList, 'AddTask'>;
+type AddProjectScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AddProject'>;
 
-const AddTaskScreen: React.FC = () => {
-  const navigation = useNavigation<AddTaskNavigationProp>();
-  const route = useRoute<AddTaskRouteProp>();
-  const { projectID } = route.params;
+const AddProjectScreen: React.FC = () => {
+  const navigation = useNavigation<AddProjectScreenNavigationProp>();
+  const { user } = useUser();
 
+  // Form fields
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [dueTime, setDueTime] = useState<Date | null>(null);
-  const [priority, setPriority] = useState<'Low' | 'Medium' | 'High'>('Low');
   const [combinedDeadline, setCombinedDeadline] = useState<string | null>(null);
 
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [assignedUser, setAssignedUser] = useState<User | null>(null);
-
+  // Date/time picker display
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await getUsers();
-        setAllUsers(data.users);
-        setFilteredUsers(data.users);
-      } catch (error) {
-        Alert.alert('Error', 'Failed to fetch users');
-      }
-    };
-    fetchUsers();
-  }, []);
+  // Member search and selection states
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
 
+  // Create combined deadline using useEffect
   useEffect(() => {
     if (dueDate && dueTime) {
       const combined = new Date(
@@ -65,34 +54,66 @@ const AddTaskScreen: React.FC = () => {
     }
   }, [dueDate, dueTime]);
 
+  // Fetch all users on mount
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredUsers([]);
+    const fetchUsers = async () => {
+      try {
+        const data = await getUsers();
+        // Expect data to be an array of users; adjust as needed based on your API response
+        setAllUsers(data.users || data);
+        setFilteredUsers(data.users || data);
+      } catch (error: any) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  // Filter users based on search query
+  useEffect(() => {
+    if (searchQuery === '') {
+      setFilteredUsers(allUsers);
     } else {
       const lowerQuery = searchQuery.toLowerCase();
-      setFilteredUsers(allUsers.filter((user) =>
-        user.username.toLowerCase().includes(lowerQuery)
-      ));
+      const filtered = allUsers.filter((u) =>
+        u.username.toLowerCase().includes(lowerQuery)
+      );
+      setFilteredUsers(filtered);
     }
   }, [searchQuery, allUsers]);
 
-  const handleCreateTask = async () => {
-    if (!title || !description || !combinedDeadline || !assignedUser) {
-      Alert.alert('Missing Fields', 'Please complete all fields');
+  // Function to add a member to selectedMembers
+  const addMember = (member: User) => {
+    // Prevent duplicates
+    if (selectedMembers.find((m) => m.userID === member.userID)) return;
+    setSelectedMembers([...selectedMembers, member]);
+  };
+
+  // Function to remove a selected member
+  const removeMember = (memberID: string) => {
+    setSelectedMembers(selectedMembers.filter((m) => m.userID !== memberID));
+  };
+
+  // Handle project creation
+  const handleCreateProject = async () => {
+    if (!title || !description) {
+      Alert.alert('Missing Fields', 'Please fill in all required fields.');
       return;
     }
 
+    if (!combinedDeadline) {
+      Alert.alert('Please select a deadline date and time');
+      return;
+    }
+
+    // Convert selectedMembers to an array of user IDs.
+    const memberIDs = selectedMembers.map((m) => m.userID);
+
     try {
-      await createTask(
-        projectID,
-        title,
-        description,
-        combinedDeadline,
-        priority,
-        assignedUser.userID
-      );
-      Alert.alert('Success', 'Task added!');
-      navigation.goBack();
+      await createProject(title, description, user?.userID || '', memberIDs[0] || '', combinedDeadline);
+      // Note: In your API, you currently send a single memberId.
+      // You could modify it to accept multiple members if desired.
+      Alert.alert('Success', 'Project created!');
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
@@ -104,27 +125,29 @@ const AddTaskScreen: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.cancel}>Cancel</Text>
         </TouchableOpacity>
-        <Text style={styles.header}>New Task</Text>
-        <TouchableOpacity onPress={handleCreateTask}>
+        <Text style={styles.header}>New Project</Text>
+        <TouchableOpacity onPress={handleCreateProject}>
           <Text style={styles.done}>Done</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
-        data={[]}
+        data={[]} // No data items; we're just using ListHeaderComponent
         keyExtractor={() => 'dummy'}
         renderItem={null}
         ListHeaderComponent={
           <View style={styles.form}>
+            {/* Title */}
             <Text style={styles.label}>Title</Text>
             <TextInput
               style={styles.input}
               value={title}
               onChangeText={setTitle}
-              placeholder="Enter task title"
+              placeholder="Enter title"
               placeholderTextColor="#999"
             />
 
+            {/* Description */}
             <Text style={styles.label}>Description</Text>
             <TextInput
               style={[styles.input, { height: 100 }]}
@@ -135,6 +158,7 @@ const AddTaskScreen: React.FC = () => {
               multiline
             />
 
+            {/* Due Date and Time */}
             <View style={styles.row}>
               <View style={styles.column}>
                 <Text style={styles.label}>Due Date</Text>
@@ -143,6 +167,7 @@ const AddTaskScreen: React.FC = () => {
                     {dueDate ? dueDate.toDateString() : 'Select date'}
                   </Text>
                 </TouchableOpacity>
+
                 {showDatePicker && (
                   <DateTimePicker
                     value={dueDate || new Date()}
@@ -158,7 +183,7 @@ const AddTaskScreen: React.FC = () => {
               </View>
 
               <View style={styles.column}>
-                <Text style={styles.label}>Due Time</Text>
+                <Text style={styles.label}>Time</Text>
                 <TouchableOpacity style={styles.input} onPress={() => setShowTimePicker(true)}>
                   <Text style={{ color: dueTime ? '#000' : '#999' }}>
                     {dueTime
@@ -166,6 +191,7 @@ const AddTaskScreen: React.FC = () => {
                       : 'Select time'}
                   </Text>
                 </TouchableOpacity>
+
                 {showTimePicker && (
                   <DateTimePicker
                     value={dueTime || new Date()}
@@ -180,53 +206,38 @@ const AddTaskScreen: React.FC = () => {
               </View>
             </View>
 
-            <Text style={styles.label}>Priority</Text>
-            <View style={styles.priorityRow}>
-              {['Low', 'Medium', 'High'].map((level) => (
-                <TouchableOpacity
-                  key={level}
-                  style={[
-                    styles.priorityButton,
-                    priority === level && styles.prioritySelected,
-                  ]}
-                  onPress={() => setPriority(level as any)}
-                >
-                  <Text
-                    style={{
-                      color: priority === level ? '#fff' : '#000',
-                      fontWeight: '600',
-                    }}
-                  >
-                    {level}
-                  </Text>
-                </TouchableOpacity>
+            {/* Members */}
+            <Text style={styles.label}>Members</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 10 }}>
+              {selectedMembers.map((member) => (
+                <View key={member.userID} style={styles.memberTag}>
+                  <Text style={styles.memberName}>{member.username}</Text>
+                  <TouchableOpacity onPress={() => removeMember(member.userID)}>
+                    <Text style={styles.memberRemove}>✕</Text>
+                  </TouchableOpacity>
+                </View>
               ))}
             </View>
 
-            <Text style={styles.label}>Assign To</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, styles.memberSelect]}
               value={searchQuery}
-              onChangeText={(text) => {
-                setSearchQuery(text);
-                setAssignedUser(null);
-              }}
-              placeholder="Search by username"
+              onChangeText={setSearchQuery}
+              placeholder="Type to search members..."
               placeholderTextColor="#999"
             />
 
-            {filteredUsers.length > 0 && (
+            {searchQuery.length > 0 && (
               <FlatList
                 data={filteredUsers}
                 keyExtractor={(item) => item.userID}
                 style={{ maxHeight: 150, backgroundColor: '#fff', marginVertical: 8, borderRadius: 10 }}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    style={styles.userItem}
+                    style={{ padding: 10, borderBottomWidth: 1, borderColor: '#eee' }}
                     onPress={() => {
-                      setAssignedUser(item);
-                      setSearchQuery(item.username);
-                      setFilteredUsers([]);
+                      addMember(item);
+                      setSearchQuery('');
                     }}
                   >
                     <Text>{item.username}</Text>
@@ -241,6 +252,8 @@ const AddTaskScreen: React.FC = () => {
   );
 };
 
+export default AddProjectScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -248,21 +261,21 @@ const styles = StyleSheet.create({
   },
   headerBar: {
     flexDirection: 'row',
-    padding: 16,
     justifyContent: 'space-between',
+    padding: 16,
     alignItems: 'center',
   },
   cancel: {
-    fontSize: 16,
     color: '#0A84FF',
-  },
-  header: {
-    color: '#000',
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 16,
   },
   done: {
     color: '#0A84FF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  header: {
+    color: '#000',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -291,31 +304,25 @@ const styles = StyleSheet.create({
   column: {
     flex: 1,
   },
-   priorityRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  memberSelect: {
     marginTop: 8,
   },
-  priorityButton: {
-    flex: 1,
-    backgroundColor: '#cccccc',
-    padding: 12,
-    marginHorizontal: 4,
-    borderRadius: 10,
+  memberTag: {
+    flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#999999',
-    borderWidth: 1,
+    backgroundColor: '#2c2c2e',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    marginRight: 8,
+    marginTop: 4,
   },
-  prioritySelected: {
-    backgroundColor: '#ff5f03',
-    borderColor: '#b34100',
-    borderWidth: 1,
+  memberName: {
+    color: '#fff',
+    marginRight: 5,
   },
-  userItem: {
-    padding: 10,
-    borderBottomColor: '#eee',
-    borderBottomWidth: 1,
+  memberRemove: {
+    color: '#ff3b30',
+    fontWeight: 'bold',
   },
 });
-
-export default AddTaskScreen;

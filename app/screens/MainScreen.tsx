@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '../context/UserContext';
-import { getProjects, getUsers } from '../api/api';
+import { getProjectByUser, getUsers } from '../api/api';
 import { RootStackParamList, Project, User } from '../helper/type';
 
 type MainScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Main'>;
@@ -26,7 +26,7 @@ const MainScreen: React.FC = () => {
 
     try {
       setError(null);
-      const response = await getProjects(user.userID);
+      const response = await getProjectByUser(user.userID);
 
       if (Array.isArray(response)) {
         setProjects(response);
