@@ -15,7 +15,7 @@ def create_task():
         status = data.get('status', 'To Do')
         priority = data.get('priority', 'Medium')
         assigned_to = data.get('assignedTo')
-        due_date = data.get('dueDate')  # Optional
+        due_date = data.get('dueDate')
         project_id = data.get('projectID')
 
         if not title or not project_id:

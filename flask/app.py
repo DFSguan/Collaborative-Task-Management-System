@@ -6,10 +6,11 @@ from project import project_routes
 from signup import signup_routes
 from login import login_routes
 from subtask import subtask_routes
+from comment import comment_routes
 
 app = Flask(__name__)
 CORS(app)
-db, _ = initialize_firebase()  # _ = auth, not needed here
+db, _ = initialize_firebase()
 
 # Register blueprints
 app.register_blueprint(signup_routes)
@@ -17,6 +18,7 @@ app.register_blueprint(login_routes)
 app.register_blueprint(project_routes)
 app.register_blueprint(task_routes)
 app.register_blueprint(subtask_routes)
+app.register_blueprint(comment_routes)
 
 @app.route('/')
 def home():
