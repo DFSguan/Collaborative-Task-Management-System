@@ -13,6 +13,9 @@ import ProjectDetailScreen from './screens/Project/ProjectDetailScreen';
 import AddTaskScreen from './screens/Task/AddTaskScreen'
 import TaskDetailScreen from './screens/Task/TaskDetailScreen';
 import TaskListScreen from './screens/Task/TaskListScreen';
+import NotificationScreen from './screens/NotificationScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import ProfileBoardScreen from './screens/Project/ProjectBoardScreen';
 import { UserProvider, useUser } from './context/UserContext';
 
 const Stack = createNativeStackNavigator();
@@ -49,9 +52,12 @@ const AppNavigator = () => {
             <Stack.Screen name="Home" component={BottomTabNavigator} />
             <Stack.Screen name="AddProject" component={AddProjectScreen} />
             <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
+            <Stack.Screen name="ProjectBoard" component={ProfileBoardScreen} />
             <Stack.Screen name="TaskList" component={TaskListScreen} />
             <Stack.Screen name="AddTask" component={AddTaskScreen} />
             <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Notification" component={NotificationScreen} />
           </>
         ) : (
           // If not logged in, show Welcome, Login, SignUp

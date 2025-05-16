@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { useUser } from '../../context/UserContext';
-import { RootStackParamList, Project, Task } from '../../helper/type'; // adjust path if needed
+import { RootStackParamList, Project, Task } from '../../helper/types'; // adjust path if needed
 import { getProjectByProjectID, getTasksByProjectIDAndAssignee } from '../../api/api'; // adjust path if needed
+import { Ionicons } from '@expo/vector-icons';
 
 // 👇 Proper type for route
 type ProjectDetailRouteProp = RouteProp<RootStackParamList, 'ProjectDetail'>;
@@ -113,8 +114,8 @@ const ProjectDetailScreen: React.FC = () => {
         ))}
 
         {/* Add Member Button */}
-        <TouchableOpacity style={styles.addButton} onPress={() => console.log('Add Member')}>
-          <Text style={styles.plusIcon}>+</Text>
+        <TouchableOpacity style={styles.fab} onPress={() => console.log('Add Member')}>
+          <Ionicons name="add" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
         
@@ -145,6 +146,12 @@ const ProjectDetailScreen: React.FC = () => {
       ) : (
         <Text style={{ color: '#888' }}>No tasks assigned to you.</Text>
       )}
+
+      <View style={styles.buttonGroup}>
+        <TouchableOpacity style={styles.viewButton}>
+          <Text style={styles.buttonText}>View more</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -233,7 +240,7 @@ const styles = StyleSheet.create({
   avatarContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 16,
+    gap: 10,
     marginBottom: 20,
   },
   avatarWrapper: {
@@ -263,18 +270,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  addButton: {
+  fab: {
+    backgroundColor: '#6200ee',
+    borderRadius: 28,
     width: 50,
     height: 50,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: '#6200ee',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 5,
   },
-  plusIcon: {
-    fontSize: 28,
-    color: '#6200ee',
+   buttonGroup: {
+    marginTop: 10,
+    marginBottom: 30,
+    alignSelf: 'center',
+  },
+  viewButton: {
+    backgroundColor: '#6200ee',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
 });
