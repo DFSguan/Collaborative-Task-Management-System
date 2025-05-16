@@ -8,13 +8,12 @@ import {
   SafeAreaView,
   FlatList,
   Alert,
-  Platform,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, User } from '../../helper/type';
+import { RootStackParamList, User } from '../../helper/types';
 import { getUsers, createTask } from '../../api/api';
+import DueDateTimePicker from '../Component/DueDateTimePicker';
 
 type AddTaskRouteProp = RouteProp<RootStackParamList, 'AddTask'>;
 type AddTaskNavigationProp = StackNavigationProp<RootStackParamList, 'AddTask'>;
@@ -35,9 +34,6 @@ const AddTaskScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [assignedUser, setAssignedUser] = useState<User | null>(null);
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -135,50 +131,12 @@ const AddTaskScreen: React.FC = () => {
               multiline
             />
 
-            <View style={styles.row}>
-              <View style={styles.column}>
-                <Text style={styles.label}>Due Date</Text>
-                <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
-                  <Text style={{ color: dueDate ? '#000' : '#999' }}>
-                    {dueDate ? dueDate.toDateString() : 'Select date'}
-                  </Text>
-                </TouchableOpacity>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={dueDate || new Date()}
-                    mode="date"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
-                    minimumDate={new Date()}
-                    onChange={(event, selectedDate) => {
-                      setShowDatePicker(Platform.OS === 'ios');
-                      if (selectedDate) setDueDate(selectedDate);
-                    }}
-                  />
-                )}
-              </View>
-
-              <View style={styles.column}>
-                <Text style={styles.label}>Due Time</Text>
-                <TouchableOpacity style={styles.input} onPress={() => setShowTimePicker(true)}>
-                  <Text style={{ color: dueTime ? '#000' : '#999' }}>
-                    {dueTime
-                      ? dueTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      : 'Select time'}
-                  </Text>
-                </TouchableOpacity>
-                {showTimePicker && (
-                  <DateTimePicker
-                    value={dueTime || new Date()}
-                    mode="time"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    onChange={(event, selectedTime) => {
-                      setShowTimePicker(Platform.OS === 'ios');
-                      if (selectedTime) setDueTime(selectedTime);
-                    }}
-                  />
-                )}
-              </View>
-            </View>
+            <DueDateTimePicker
+              dueDate={dueDate}
+              dueTime={dueTime}
+              setDueDate={setDueDate}
+              setDueTime={setDueTime}
+            />
 
             <Text style={styles.label}>Priority</Text>
             <View style={styles.priorityRow}>
@@ -263,7 +221,7 @@ const styles = StyleSheet.create({
   },
   done: {
     color: '#0A84FF',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   form: {
@@ -272,6 +230,8 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#000',
+    fontSize: 14,
+    fontWeight: '600',
     marginBottom: 6,
     marginTop: 16,
   },
@@ -281,7 +241,7 @@ const styles = StyleSheet.create({
     padding: 12,
     color: '#000',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#808080',
   },
   row: {
     flexDirection: 'row',

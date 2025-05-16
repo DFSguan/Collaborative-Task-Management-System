@@ -11,7 +11,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { loginUser } from '../api/api';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext';
-import { RootStackParamList } from '../helper/type';
+import { RootStackParamList } from '../helper/types';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 

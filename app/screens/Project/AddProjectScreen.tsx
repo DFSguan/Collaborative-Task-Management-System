@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, User } from '../../helper/type';
+import { RootStackParamList, User } from '../../helper/types';
 import { useUser } from '../../context/UserContext';
 import { createProject, getUsers } from '../../api/api';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DueDateTimePicker from '../Component/DueDateTimePicker';
 
 type AddProjectScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AddProject'>;
 
@@ -29,10 +29,6 @@ const AddProjectScreen: React.FC = () => {
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [dueTime, setDueTime] = useState<Date | null>(null);
   const [combinedDeadline, setCombinedDeadline] = useState<string | null>(null);
-
-  // Date/time picker display
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
 
   // Member search and selection states
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -159,52 +155,12 @@ const AddProjectScreen: React.FC = () => {
             />
 
             {/* Due Date and Time */}
-            <View style={styles.row}>
-              <View style={styles.column}>
-                <Text style={styles.label}>Due Date</Text>
-                <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
-                  <Text style={{ color: dueDate ? '#000' : '#999' }}>
-                    {dueDate ? dueDate.toDateString() : 'Select date'}
-                  </Text>
-                </TouchableOpacity>
-
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={dueDate || new Date()}
-                    mode="date"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
-                    minimumDate={new Date()}
-                    onChange={(event, selectedDate) => {
-                      setShowDatePicker(Platform.OS === 'ios');
-                      if (selectedDate) setDueDate(selectedDate);
-                    }}
-                  />
-                )}
-              </View>
-
-              <View style={styles.column}>
-                <Text style={styles.label}>Time</Text>
-                <TouchableOpacity style={styles.input} onPress={() => setShowTimePicker(true)}>
-                  <Text style={{ color: dueTime ? '#000' : '#999' }}>
-                    {dueTime
-                      ? dueTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      : 'Select time'}
-                  </Text>
-                </TouchableOpacity>
-
-                {showTimePicker && (
-                  <DateTimePicker
-                    value={dueTime || new Date()}
-                    mode="time"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    onChange={(event, selectedTime) => {
-                      setShowTimePicker(Platform.OS === 'ios');
-                      if (selectedTime) setDueTime(selectedTime);
-                    }}
-                  />
-                )}
-              </View>
-            </View>
+            <DueDateTimePicker
+              dueDate={dueDate}
+              dueTime={dueTime}
+              setDueDate={setDueDate}
+              setDueTime={setDueTime}
+            />
 
             {/* Members */}
             <Text style={styles.label}>Members</Text>
@@ -267,16 +223,16 @@ const styles = StyleSheet.create({
   },
   cancel: {
     color: '#0A84FF',
-    fontSize: 16,
+    fontSize: 18,
   },
   done: {
     color: '#0A84FF',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   header: {
     color: '#000',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   form: {
@@ -285,6 +241,8 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#000',
+    fontSize: 14,
+    fontWeight: '600',
     marginBottom: 6,
     marginTop: 16,
   },
@@ -294,7 +252,7 @@ const styles = StyleSheet.create({
     padding: 12,
     color: '#000',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#808080',
   },
   row: {
     flexDirection: 'row',

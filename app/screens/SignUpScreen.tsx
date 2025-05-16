@@ -10,7 +10,7 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { signUpUser } from '../api/api';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../helper/type';
+import { RootStackParamList } from '../helper/types';
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'SignUp'>;
 
