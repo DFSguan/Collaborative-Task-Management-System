@@ -190,3 +190,50 @@ def update_project():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@project_routes.route('/get_project_overview', methods=['GET'])
+def get_project_overview():
+    try:
+        project_id = request.args.get('projectID')
+
+        if not project_id:
+            return jsonify({'error': 'projectID is required'}), 400
+
+        project_doc = db.collection('Project').document(project_id).get()
+        if not project_doc.exists:
+            return jsonify({'error': 'Project not found'}), 404
+
+        project_data = project_doc.to_dict()
+
+        # Get tasks under this project
+        tasks_query = db.collection('Tasks').where('projectID', '==', project_id).stream()
+        tasks = []
+
+        for task_doc in tasks_query:
+            task_data = task_doc.to_dict()
+            task_id = task_data['taskID']
+
+            # Count comments for this task
+            comment_query = db.collection('Comments').where('taskID', '==', task_id).stream()
+            comment_count = sum(1 for _ in comment_query)
+
+            tasks.append({
+                'taskID': task_id,
+                'title': task_data.get('title'),
+                'dueDate': task_data.get('dueDate'),
+                'commentCount': comment_count
+            })
+
+        result = {
+            'projectID': project_id,
+            'title': project_data.get('title'),
+            'description': project_data.get('description'),
+            'deadline': project_data.get('deadline'),
+            'members': project_data.get('members'),
+            'tasks': tasks
+        }
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
